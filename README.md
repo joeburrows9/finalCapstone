@@ -5,13 +5,9 @@ Capstone tasks are a part of the HyperionDev Software Engineering bootcamp and d
 
 ### Table of contents
 
-[1. Capstone One - Finance Calculations](#capstone-one)
+[1. Capstone One - Finance Calculations](#capstone-one)        [Project link](https://github.com/joeburrows9/finalCapstone/blob/main/finance_calculations.py)
 
-[Project link](https://github.com/joeburrows9/finalCapstone/blob/main/finance_calculations.py)
-
-    [2. Capstone Two - Task Manager](#capstone-two)
-  
-    [Project link](https://github.com/joeburrows9/finalCapstone/blob/main/task_manager.py)
+[2. Capstone Two - Task Manager](#capstone-two)            [Project link](https://github.com/joeburrows9/finalCapstone/blob/main/task_manager.py)
 
 ### Installation
 
