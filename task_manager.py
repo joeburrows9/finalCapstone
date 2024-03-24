@@ -1,3 +1,7 @@
+# Task Manager
+
+# Capstone task 17
+
 # Notes: 
 # 1. Use the following username and password to access the admin rights 
 # username: admin
@@ -8,6 +12,8 @@
 #=====importing libraries===========
 import os
 from datetime import datetime, date
+
+# Date formatting 
 
 DATETIME_STRING_FORMAT = "%Y-%m-%d"
 
@@ -21,6 +27,7 @@ with open("tasks.txt", 'r') as task_file:
     task_data = task_file.read().split("\n")
     task_data = [t for t in task_data if t != ""]
 
+# Creates task list
  
 task_list = []
 for t_str in task_data:
@@ -31,36 +38,55 @@ for t_str in task_data:
     curr_t['username'] = task_components[0]
     curr_t['title'] = task_components[1]
     curr_t['description'] = task_components[2]
-    curr_t['due_date'] = datetime.strptime(task_components[3], DATETIME_STRING_FORMAT)
-    curr_t['assigned_date'] = datetime.strptime(task_components[4], DATETIME_STRING_FORMAT)
+    curr_t['due_date'] = datetime.strptime(task_components[3], 
+                                           DATETIME_STRING_FORMAT)
+    curr_t['assigned_date'] = datetime.strptime(task_components[4], 
+                                                DATETIME_STRING_FORMAT)
     curr_t['completed'] = True if task_components[5] == "Yes" else False
 
     task_list.append(curr_t)
 
-# Variables to be used later.
+# Variables to be used later
     
 total_tasks = len(task_list)
 completed_tasks = sum(task['completed'] for task in task_list)
-overdue_user_tasks = sum(1 for task in task_list if not task['completed'] and task['due_date'].date() < datetime.now().date())
+overdue_user_tasks = sum(1 for task in task_list if not task['completed'] 
+                         and task['due_date'].date() < datetime.now().date())
 incomplete_tasks = total_tasks - completed_tasks
+
+# If statement calculates the percentage
+
 if completed_tasks >= 1:
     percentage_incomplete = float((incomplete_tasks / total_tasks) * 100)
 elif completed_tasks <= 1:
     percentage_incomplete = 100
 else:
     print("")
-overdue_tasks = sum(1 for task in task_list if not task['completed'] and task['due_date'].date() < datetime.now().date())
+
+overdue_tasks = sum(1 for task in task_list if not task['completed'] and 
+                    task['due_date'].date() < datetime.now().date())
+
+# If statement calculates the percentage
+
 if overdue_tasks >= 1:
     percentage_overdue = float((overdue_tasks / total_tasks) * 100)
 elif overdue_tasks <= 1:
     percentage_overdue = 0
 else:
     print("")
+reg_user = "r"
+add_task = "a"
+view_all = "va"
+view_mine = "vm"
+generate_reports = "gr"
+display_statistics = "ds"
+
 
 #====Login Section====
 '''This code reads usernames and password from the user.txt file to 
     allow a user to login.
 '''
+# Some definitions to start
 
 # If no user.txt file, create one with a default account
 if not os.path.exists("user.txt"):
@@ -92,8 +118,12 @@ for user in user_data:
     else:
         print(f"Invalid entry: {user}")
 
+# Login starts here
+
 logged_in = False
 while not logged_in:
+
+    # Checks login credentials
 
     print("LOGIN")
     curr_user = input("Username: ")
@@ -122,8 +152,10 @@ ds - Display statistics
 e - Exit
 : ''').lower()
 
-    #Add a new user to the user.txt file
-    if menu == 'r':
+    # Register user
+
+    # Add a new user to the user.txt file
+    if menu == reg_user:
    
         # Load existing usernames
         username_password = {}
@@ -163,25 +195,39 @@ e - Exit
             else:
                 print("Error: Passwords do not match.")
 
-    elif menu == "a":
+    # Add task
+
+    elif menu == add_task:
         '''Allow a user to add a new task to task.txt file
             Prompt a user for the following: 
-             - A username of the person whom the task is assigned to,
-             - A title of a task,
-             - A description of the task and 
-             - the due date of the task.'''
+            - A username of the person whom the task is assigned to,
+            - A title of a task,
+            - A description of the task and 
+            - the due date of the task.'''
+        # Add a name
+
         task_username = input("Name of person assigned to task: ")
-        if task_username not in username_password.keys():
+
+        # Checks the user exists in txt file
+        if task_username not in username_password:
             print("User does not exist. Please enter a valid username")
             continue
         task_title = input("Title of Task: ")
         task_description = input("Description of Task: ")
+
+        # Due dates in the past are rejected
         while True:
             try:
                 task_due_date = input("Due date of task (YYYY-MM-DD): ")
                 due_date_time = datetime.strptime(task_due_date, DATETIME_STRING_FORMAT)
+                if due_date_time < datetime.now():
+                    print("Due date cannot be set to a date in the past. Please enter a future date.")
+                    continue
+                else:
+                    print("")
                 break
 
+            # Error message for incorrect data formatting
             except ValueError:
                 print("Invalid datetime format. Please use the format specified")
 
@@ -198,6 +244,8 @@ e - Exit
             "assigned_date": curr_date,
             "completed": False
         }
+
+        # Updates the task in file
 
         task_list.append(new_task)
         with open("tasks.txt", "w") as task_file:
@@ -216,11 +264,14 @@ e - Exit
         print("Task successfully added.")
 
 
-    elif menu == 'va':
+# View all
+
+    elif menu == view_all:
         '''Reads the task from task.txt file and prints to the console in the 
            format of Output 2 presented in the task pdf (i.e. includes spacing
            and labelling) 
         '''
+        # Shows the data with titles for how they appear in the txt file
 
         for t in task_list:
             disp_str = f"Task: \t\t {t['title']}\n"
@@ -229,11 +280,15 @@ e - Exit
             disp_str += f"Due Date: \t {t['due_date'].strftime(DATETIME_STRING_FORMAT)}\n"
             disp_str += f"Task Description: \n {t['description']}\n"
             print(disp_str)
-            
 
-    elif menu == 'vm':
+    # View mine       
+
+    elif menu == view_mine:
         '''Reads the task from task.txt file and prints to the console in the 
         format of Output 2 presented in the task pdf (i.e. includes spacing and labeling)'''
+
+        # Shows current task list out of those which are still active
+
         for i, t in enumerate(task_list, 1):
             if t['username'] == curr_user:
                 disp_str = f"Task {i}:\n"
@@ -246,40 +301,101 @@ e - Exit
                 print(disp_str)
 
         # The user can select a task or return to the main menu.
+                
         task_choice = input("Please enter the your task number, or enter -1 to return to the main menu: ")
 
         if task_choice.isdigit() and 1 <= int(task_choice) <= len(task_list):
             selected_task_index = int(task_choice) - 1
             selected_task = task_list[selected_task_index]
 
+            # If it has been completed an error message displays
+
+            if selected_task['completed']:
+                print("Error: This task is already completed and cannot be edited.")
+                continue
+
             # User option to mark complete or to edit the task.
-            action_choice = input("Please select an action:\n1. Mark as Complete\n2. Edit Task\nEnter your selection: ")
+
+            action_choice = input('''Please select an action:
+                                  1. Mark as Complete
+                                  2. Edit Task
+                                  
+                                  Enter your selection: ''')
 
             if action_choice == '1':
+
                 # To mark a task as complete.
-                
-                selected_task['completed'] = 'Yes'
+
+                selected_task['completed'] = True
                 print("Task marked as complete.")
-            elif action_choice == '2' and selected_task['completed'] == 'No' or 'False':
+            
+            elif action_choice == '2':
 
                 # Edit the task only if not completed.
 
-                new_username = input("Enter new username (press Enter to keep the current username): ")
-                new_due_date = input("Enter new due date in the format YYYY-MM-DD (press Enter to keep the current due date): ")
+                new_username = input("Enter new username: ")
 
+                # Checks the username exists.
+
+                if new_username not in username_password:
+                    print("User does not exist. Please enter a valid username")
+                    continue
+                else:
+                    print("")
+
+                # Checks date is in the future
+                # Shows error if in the past
+                    while True:
+                        try:
+                            new_due_date = input("Enter new due date of task (YYYY-MM-DD): ")
+                            new_date_time = datetime.strptime(new_due_date, DATETIME_STRING_FORMAT)
+                            if new_date_time < datetime.now():
+                                print("Due date cannot be set to a date in the past. Please enter a future date.")
+                                continue
+                            else:
+                                print("")
+                            break
+                        except ValueError:
+                            print("Invalid datetime format. Please use the format specified")
+                # Continues to other questions
                 if new_username:
                     selected_task['username'] = new_username
+
                 if new_due_date:
                     selected_task['due_date'] = datetime.strptime(new_due_date, DATETIME_STRING_FORMAT)
 
-                print("Task edited successfully.")
+                    print("Task edited successfully.")
+                else:
+                    print("")
+            
+            # Error messages for invalid input
+
             elif action_choice == '2' and selected_task['completed'] == 'Yes':
                 print("Error: Unable to edit task.")
+
             else:
                 print("Invalid input.")
 
 
-    elif menu == 'gr': 
+        # After updating task_list with new_task or edited task
+                
+        with open("tasks.txt", "w") as task_file:
+            task_list_to_write = []
+            for t in task_list:
+                str_attrs = [
+                    t['username'],
+                    t['title'],
+                    t['description'],
+                    t['due_date'].strftime(DATETIME_STRING_FORMAT),
+                    t['assigned_date'].strftime(DATETIME_STRING_FORMAT),
+                    "Yes" if t['completed'] else "No"
+                ]
+                task_list_to_write.append(";".join(str_attrs))
+            task_file.write("\n".join(task_list_to_write))
+
+# Generate reports
+
+    elif menu == generate_reports: 
 
         print("\n\nYour report is generating - check your source folder!")
 
@@ -293,9 +409,11 @@ e - Exit
             task_overview_file.write(f"Percentage of tasks incomplete: {percentage_incomplete:.2f}%\n")
             task_overview_file.write(f"Percentage of tasks overdue: {percentage_overdue:.2f}%\n")
 
-        # This path creates a user overview.
+        # This path creates a user overview
             
         total_users = len(username_password.keys())
+
+        # Formats and writes the file into user_overview.txt
 
         with open("user_overview.txt", "w") as user_overview_file:
             user_overview_file.write(f"Total number of users: {total_users}\n")
@@ -305,43 +423,48 @@ e - Exit
                 user_tasks = [task for task in task_list if task['username'] == user]
                 total_user_tasks = len(user_tasks)
                 incomplete_user_tasks = total_user_tasks - completed_tasks
-                overdue_user_tasks = sum(1 for task in user_tasks if not task['completed'] and task['due_date'].date() < datetime.now().date())
+                overdue_user_tasks = sum(1 for task in user_tasks if not task['completed'] and 
+                                         task['due_date'].date() < datetime.now().date())
 
-                percentage_user_tasks = float((total_user_tasks / total_tasks) * 100)
+                # If statements to determine percentages
 
-                if completed_tasks >= 1:
-                    percentage_completed_user_tasks = float((completed_tasks / total_user_tasks) * 100)
-                elif completed_tasks <= 1:
+                if total_user_tasks > 0:
+                    percentage_user_tasks = float((total_user_tasks / total_tasks) * 100)
+                else:
+                    percentage_user_tasks = 0
+
+                if total_user_tasks > 0:
+                    percentage_completed_user_tasks = (float(completed_tasks / total_user_tasks) * 100)
+                else:
                     percentage_completed_user_tasks = 0
-                else:
-                    print('')
 
-
-                if incomplete_user_tasks >= 1:
+                if total_user_tasks > 0:
                     percentage_incomplete_user_tasks = float((incomplete_user_tasks / total_user_tasks) * 100)
-                elif incomplete_user_tasks <= 1:
-                    percentage_incomplete_user_tasks = 0
                 else:
-                    print('')  
+                    percentage_incomplete_user_tasks = 0
 
-
-                if overdue_user_tasks >= 1:
-                    percentage_overdue_user_tasks = 0
-                elif overdue_user_tasks <= 1:
+                if total_user_tasks > 0:
                     percentage_overdue_user_tasks = float((overdue_user_tasks / total_user_tasks) * 100)
                 else:
-                    print('')
+                    percentage_overdue_user_tasks = 0
 
-                user_overview_file.write(f"\nUser: {user}\n")
-                user_overview_file.write(f"  Total number of tasks assigned: {total_user_tasks}\n")
-                user_overview_file.write(f"  Percentage of total tasks assigned: {percentage_user_tasks:.2f}%\n")
-                user_overview_file.write(f"  Percentage of completed tasks: {percentage_completed_user_tasks:.2f}%\n")
-                user_overview_file.write(f"  Percentage of incomplete tasks: {percentage_incomplete_user_tasks:.2f}%\n")
-                user_overview_file.write(f"  Percentage of overdue tasks: {percentage_overdue:.2f}%\n")
+                # Writes the calculations to the user_overview.txt file
+
+                user_overview_file.write(f'''\nUser: {user}\n''')
+                user_overview_file.write(f'''  Total number of tasks assigned: 
+                                         {total_user_tasks}\n''')
+                user_overview_file.write(f'''  Percentage of total tasks assigned: 
+                                         {percentage_user_tasks:.2f}%\n''')
+                user_overview_file.write(f'''  Percentage of completed tasks: 
+                                         {percentage_completed_user_tasks:.2f}%\n''')
+                user_overview_file.write(f'''  Percentage of incomplete tasks:
+                                         {percentage_incomplete_user_tasks:.2f}%\n''')
+                user_overview_file.write(f'''  Percentage of overdue tasks: 
+                                         {percentage_overdue:.2f}%\n''')
         
-            
+    # Display statistics
     
-    elif menu == 'ds' and curr_user == 'admin':
+    elif menu == display_statistics and curr_user == 'admin':
         # Checks on the system whether a report files exist, if not - this will create them.
         if not os.path.exists("task_overview.txt") or not os.path.exists("user_overview.txt"):
             # Creates a task overview.
@@ -362,48 +485,52 @@ e - Exit
                     user_tasks = [task for task in task_list if task['username'] == user]
                     total_user_tasks = len(user_tasks)
                     incomplete_user_tasks = total_user_tasks - completed_tasks
-                    overdue_user_tasks = sum(1 for task in user_tasks if not task['completed'] and task['due_date'].date() < datetime.now().date())
+                    overdue_user_tasks = sum(1 for task in user_tasks if not task['completed'] and
+                                              task['due_date'].date() < datetime.now().date())
                 
                     percentage_user_tasks = float((total_user_tasks / total_tasks) * 100)
+            
+            # If statements to determine percentages 
 
-                    if completed_tasks >= 1:
-                        percentage_completed_user_tasks = float((completed_tasks / total_user_tasks) * 100)
-                    elif completed_tasks <= 1:
-                        percentage_completed_user_tasks = 0
-                    else:
-                        print('')
-                    
-                    if incomplete_user_tasks >= 1:
-                        percentage_incomplete_user_tasks = float((incomplete_user_tasks / total_user_tasks) * 100)
-                    elif incomplete_user_tasks <= 1:
-                        percentage_incomplete_user_tasks = 0
-                    else:
-                        print('')                   
+            if total_user_tasks > 0:
+                percentage_user_tasks = float((total_user_tasks / total_tasks) * 100)
+            else:
+                percentage_user_tasks = 0
 
-                    if overdue_user_tasks >= 1:
-                        percentage_overdue_user_tasks = float((overdue_user_tasks / total_user_tasks) * 100)
-                    elif overdue_user_tasks <= 1:
-                        percentage_overdue_user_tasks = 0
-                    else:
-                        print('')
+            if total_user_tasks > 0:
+                percentage_completed_user_tasks = (float(completed_tasks / total_user_tasks) * 100)
+            else:
+                percentage_completed_user_tasks = 0
 
-                    with open("user_overview.txt", "w") as user_overview_file:
-                        user_overview_file.write(f"\nUser: {user}\n")
-                        user_overview_file.write(f"  Total number of tasks assigned: {total_user_tasks}\n")
-                        user_overview_file.write(f"  Percentage of total tasks assigned: {percentage_user_tasks:.2f}%\n")
-                        user_overview_file.write(f"  Percentage of completed tasks: {percentage_completed_user_tasks:.2f}%\n")
-                        user_overview_file.write(f"  Percentage of incomplete tasks: {percentage_incomplete_user_tasks:.2f}%\n")
-                        user_overview_file.write(f"  Percentage of overdue tasks: {percentage_overdue_user_tasks:.2f}%\n")
+            if total_user_tasks > 0:
+                percentage_incomplete_user_tasks = float((incomplete_user_tasks / total_user_tasks) * 100)
+            else:
+                percentage_incomplete_user_tasks = 0
+
+            if total_user_tasks > 0:
+                percentage_overdue_user_tasks = float((overdue_user_tasks / total_user_tasks) * 100)
+            else:
+                percentage_overdue_user_tasks = 0
+
+            #  Writes the calculations to the user_overview.txt file
+
+            with open("user_overview.txt", "r") as user_overview_file:
+                print(f"\nUser: {user}\n")
+                print(f"  Total number of tasks assigned: {total_user_tasks}\n")
+                print(f"  Percentage of total tasks assigned: {percentage_user_tasks:.2f}%\n")
+                print(f"  Percentage of completed tasks: {percentage_completed_user_tasks:.2f}%\n")
+                print(f"  Percentage of incomplete tasks: {percentage_incomplete_user_tasks:.2f}%\n")
+                print(f"  Percentage of overdue tasks: {percentage_overdue_user_tasks:.2f}%\n")
 
 
-                    # View and display the reports
-                    with open("task_overview.txt", "r") as task_overview_file:
-                        print("\nTask Overview Report:\n" + task_overview_file.read())
+            # View and display the reports
+            with open("task_overview.txt", "r") as task_overview_file:
+                print("\nTask Overview Report:\n" + task_overview_file.read())
 
-                    with open("user_overview.txt", "r") as user_overview_file:
-                        print("\nUser Overview Report:\n" + user_overview_file.read())
+            with open("user_overview.txt", "r") as user_overview_file:
+                print("\nUser Overview Report:\n" + user_overview_file.read())
           
-
+    # Exit
 
     elif menu == 'e':
         print('Goodbye!!!')
